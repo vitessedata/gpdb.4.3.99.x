@@ -1,0 +1,154 @@
+--
+-- json type. 
+--
+
+DROP TYPE IF EXISTS json /*CASCADE*/; -- cascade will drop columns silently
+
+--
+-- Shell type to keep things a bit quieter.
+--
+CREATE TYPE json; 
+
+--
+--  Input and output functions.
+--
+CREATE FUNCTION json_in(cstring) 
+RETURNS json
+AS 'MODULE_PATHNAME', 'exx_json_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION json_out(json)
+RETURNS cstring
+AS 'MODULE_PATHNAME', 'exx_json_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION json_recv(internal)
+RETURNS json
+AS 'MODULE_PATHNAME', 'exx_json_recv'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION json_send(json)
+RETURNS bytea 
+AS 'MODULE_PATHNAME', 'exx_json_send'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE json( 
+    INPUT          = json_in,
+    OUTPUT         = json_out,
+    RECEIVE        = json_recv,
+    SEND           = json_send,
+    STORAGE        = extended,
+    INTERNALLENGTH = VARIABLE 
+);
+
+--  group 1: arithmatics, 
+CREATE FUNCTION array_to_json(anyarray) 
+RETURNS json 
+AS 'MODULE_PATHNAME', 'exx_array_to_json' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION array_to_json(anyarray, bool) 
+RETURNS json 
+AS 'MODULE_PATHNAME', 'exx_array_to_json_pretty' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION row_to_json(record)
+RETURNS json 
+AS 'MODULE_PATHNAME', 'exx_row_to_json' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION row_to_json(record, bool) 
+RETURNS json 
+AS 'MODULE_PATHNAME', 'exx_row_to_json_pretty' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION to_json(anyelement) 
+RETURNS json 
+AS 'MODULE_PATHNAME', 'exx_to_json' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION json_array_length(json)
+RETURNS integer 
+AS 'MODULE_PATHNAME', 'exx_json_array_length' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION json_extract_path(json, text[])
+RETURNS json
+AS 'MODULE_PATHNAME', 'exx_json_extract_path' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION json_extract_path_text(json, text[])
+RETURNS text 
+AS 'MODULE_PATHNAME', 'exx_json_extract_path' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION json_object_field(json, text) 
+RETURNS json
+AS 'MODULE_PATHNAME', 'exx_json_object_field' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION json_object_field_text(json, text) 
+RETURNS text 
+AS 'MODULE_PATHNAME', 'exx_json_object_field_text'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION json_array_element(json, integer) 
+RETURNS json
+AS 'MODULE_PATHNAME', 'exx_json_array_element' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION json_array_element_text(json, integer) 
+RETURNS text 
+AS 'MODULE_PATHNAME', 'exx_json_array_element_text' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION json_is_valid(text) 
+RETURNS bool 
+AS 'MODULE_PATHNAME', 'exx_json_is_valid' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION json_parse_valid(text) 
+RETURNS json
+AS 'MODULE_PATHNAME', 'exx_json_parse_valid' 
+LANGUAGE C IMMUTABLE STRICT;
+
+-- 
+-- operators
+-- 
+CREATE OPERATOR -> (
+  PROCEDURE = json_object_field, 
+  LEFTARG = json, RIGHTARG = text 
+);
+
+CREATE OPERATOR ->> (
+  PROCEDURE = json_object_field_text, 
+  LEFTARG = json, RIGHTARG = text 
+);
+
+CREATE OPERATOR -> (
+  PROCEDURE = json_array_element, 
+  LEFTARG = json, RIGHTARG = integer
+);
+
+CREATE OPERATOR ->> (
+  PROCEDURE = json_array_element_text, 
+  LEFTARG = json, RIGHTARG = integer
+);
+
+CREATE OPERATOR #> (
+  PROCEDURE = json_extract_path, 
+  LEFTARG = json, RIGHTARG = text[] 
+);
+
+CREATE OPERATOR #>> (
+  PROCEDURE = json_extract_path_text, 
+  LEFTARG = json, RIGHTARG = text[]
+);
+
+-- CAST
+CREATE FUNCTION json_parse_valid_varchar(varchar) returns json
+as 'select json_parse_valid($1::text);'
+LANGUAGE SQL IMMUTABLE;
+
+CREATE CAST (text as json) WITH FUNCTION json_parse_valid(text);
+CREATE CAST (varchar as json) WITH FUNCTION json_parse_valid_varchar(varchar); 

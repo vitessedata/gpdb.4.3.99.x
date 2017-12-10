@@ -1,0 +1,20 @@
+-- start
+--
+-- abs_srcdir     #is_transformed_to# /home/cktan/p/xxx-gpdb-4.3.x/gpdb/src/test/regress
+-- abs_builddir   #is_transformed_to# /home/cktan/p/xxx-gpdb-4.3.x/gpdb/src/test/regress
+-- testtablespace #is_transformed_to# /home/cktan/p/xxx-gpdb-4.3.x/gpdb/src/test/regress/testtablespace
+-- DLSUFFIX       #is_transformed_to# .so
+-- hostname       #is_transformed_to# islandplace
+-- gpwhich_gpfdist #is_transformed_to# /home/cktan/p/xxx-gpdb-4.3.x/run/gphome/bin/gpfdist
+-- gpwhich_curl    #is_transformed_to# /usr/bin/curl
+-- gpwhich_gunzip  #is_transformed_to# /bin/gunzip
+-- gpwhich_gpmapreduce  #is_transformed_to# @gpwhich_gpmapreduce@
+-- gpwhich_get_ereport.pl  #is_transformed_to# /home/cktan/p/xxx-gpdb-4.3.x/run/gphome/bin/get_ereport.pl
+-- gpcurusername #is_transformed_to# cktan
+-- gpfilespace_regressionfs1 #is_transformed_to# ( 1: '/home/cktan/p/xxx-gpdb-4.3.x/run/data/gpregr_regressionfs1_p1', 2: '/home/cktan/p/xxx-gpdb-4.3.x/run/data/gpregr_regressionfs1_p2', 3: '/home/cktan/p/xxx-gpdb-4.3.x/run/data/gpregr_regressionfs1_p3' ) 
+-- gpfilespace_regressionfs2 #is_transformed_to# ( 1: '/home/cktan/p/xxx-gpdb-4.3.x/run/data/gpregr_regressionfs2_p1', 2: '/home/cktan/p/xxx-gpdb-4.3.x/run/data/gpregr_regressionfs2_p2', 3: '/home/cktan/p/xxx-gpdb-4.3.x/run/data/gpregr_regressionfs2_p3' ) 
+-- gpfilespace_regressionfs3 #is_transformed_to# ( 1: '/home/cktan/p/xxx-gpdb-4.3.x/run/data/gpregr_regressionfs3_p1', 2: '/home/cktan/p/xxx-gpdb-4.3.x/run/data/gpregr_regressionfs3_p2', 3: '/home/cktan/p/xxx-gpdb-4.3.x/run/data/gpregr_regressionfs3_p3' ) 
+-- gp_glob_connect  #is_transformed_to# -p 5432 -d template1
+--
+-- 
+-- end

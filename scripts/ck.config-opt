@@ -1,0 +1,6 @@
+set -e
+export PATH="/opt/llvm-release/bin:$PATH"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+rm -rf /gpdb/*
+(cd $DIR/../gpdb && ./configure --prefix=/gpdb && make clean && make -j8 && make install)
+

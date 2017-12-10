@@ -1,0 +1,179 @@
+--
+-- xuuid type. 
+--
+
+DROP TYPE IF EXISTS uuid CASCADE; -- cascade will drop columns silently
+
+--
+-- Shell type to keep things a bit quieter.
+--
+CREATE TYPE uuid; 
+
+--
+--  Input and output functions.
+--
+CREATE FUNCTION uuid_in(cstring) 
+RETURNS uuid
+AS 'MODULE_PATHNAME', 'exx_uuid_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION uuid_out(uuid) 
+RETURNS cstring
+AS 'MODULE_PATHNAME', 'exx_uuid_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION uuid_recv(internal)
+RETURNS uuid
+AS 'MODULE_PATHNAME', 'exx_uuid_recv'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION uuid_send(uuid) 
+RETURNS bytea 
+AS 'MODULE_PATHNAME', 'exx_uuid_send'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE uuid( 
+    INPUT          = uuid_in,
+    OUTPUT         = uuid_out,
+    RECEIVE        = uuid_recv,
+    SEND           = uuid_send,
+    INTERNALLENGTH = 16 
+);
+
+-- compares 
+CREATE FUNCTION uuid_eq(uuid, uuid)
+RETURNS boolean 
+AS 'MODULE_PATHNAME', 'exx_uuid_eq' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION uuid_ne(uuid, uuid)
+RETURNS boolean
+AS 'MODULE_PATHNAME', 'exx_uuid_ne' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION uuid_lt(uuid, uuid)
+RETURNS boolean
+AS 'MODULE_PATHNAME', 'exx_uuid_lt' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION uuid_le(uuid, uuid)
+RETURNS boolean
+AS 'MODULE_PATHNAME', 'exx_uuid_le' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION uuid_gt(uuid, uuid)
+RETURNS boolean
+AS 'MODULE_PATHNAME', 'exx_uuid_gt'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION uuid_ge(uuid, uuid)
+RETURNS boolean
+AS 'MODULE_PATHNAME', 'exx_uuid_ge' 
+LANGUAGE C IMMUTABLE STRICT;
+
+-- : hash and cmp
+CREATE FUNCTION uuid_hash(uuid) 
+RETURNS integer 
+AS 'MODULE_PATHNAME', 'exx_uuid_hash' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION uuid_cmp(uuid, uuid)
+RETURNS integer 
+AS 'MODULE_PATHNAME', 'exx_uuid_cmp'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION uuid_gen()
+RETURNS uuid
+AS 'MODULE_PATHNAME', 'exx_uuid_gen'
+LANGUAGE C VOLATILE; 
+
+-- conversion
+CREATE FUNCTION text_uuid(text) 
+RETURNS uuid
+AS 'MODULE_PATHNAME', 'exx_text_uuid' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION uuid_text(uuid)
+RETURNS text
+AS 'MODULE_PATHNAME', 'exx_uuid_text'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION varchar_uuid(varchar) 
+RETURNS uuid
+AS 'MODULE_PATHNAME', 'exx_varchar_uuid' 
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION uuid_varchar(uuid)
+RETURNS varchar 
+AS 'MODULE_PATHNAME', 'exx_uuid_varchar'
+LANGUAGE C IMMUTABLE STRICT;
+
+-- operators
+CREATE OPERATOR < (
+  PROCEDURE = uuid_lt,
+  LEFTARG = uuid, RIGHTARG = uuid,
+  COMMUTATOR = >,
+  NEGATOR = >=
+);
+
+CREATE OPERATOR <= (
+  PROCEDURE = uuid_le,
+  LEFTARG = uuid, RIGHTARG = uuid,
+  COMMUTATOR = >=,
+  NEGATOR = >
+);
+
+CREATE OPERATOR > (
+  PROCEDURE = uuid_gt,
+  LEFTARG = uuid, RIGHTARG = uuid,
+  COMMUTATOR = <,
+  NEGATOR = <=
+);
+
+CREATE OPERATOR >= (
+  PROCEDURE = uuid_ge,
+  LEFTARG = uuid, RIGHTARG = uuid,
+  COMMUTATOR = <=,
+  NEGATOR = <
+);
+
+CREATE OPERATOR = (
+  PROCEDURE = uuid_eq,
+  LEFTARG = uuid, RIGHTARG = uuid,
+  COMMUTATOR = =,
+  NEGATOR = <>,
+  MERGES, HASHES
+);
+
+CREATE OPERATOR <> (
+  PROCEDURE = uuid_ne,
+  LEFTARG = uuid, RIGHTARG = uuid,
+  COMMUTATOR = <>,
+  NEGATOR = =
+);
+
+CREATE OPERATOR CLASS uuid_op_cls DEFAULT 
+FOR TYPE uuid USING btree AS
+    OPERATOR 1 <,
+    OPERATOR 2 <=,
+    OPERATOR 3 =,
+    OPERATOR 4 >=,
+    OPERATOR 5 >,
+    FUNCTION 1 uuid_cmp(uuid, uuid);
+
+CREATE OPERATOR CLASS uuid_op_cls DEFAULT
+FOR TYPE uuid USING hash AS
+    OPERATOR 1 =,
+    FUNCTION 1 uuid_hash(uuid);
+
+CREATE CAST(text AS uuid)
+WITH FUNCTION text_uuid(text);
+
+CREATE CAST(uuid AS text)
+WITH FUNCTION uuid_text(uuid); 
+
+CREATE CAST(varchar AS uuid)
+WITH FUNCTION varchar_uuid(varchar); 
+
+CREATE CAST(uuid AS varchar)
+WITH FUNCTION uuid_varchar(uuid); 

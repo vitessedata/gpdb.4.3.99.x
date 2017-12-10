@@ -1,0 +1,59 @@
+--
+-- VACUUM
+--
+CREATE TABLE vactst (j INT DEFAULT 1,i INT);
+INSERT INTO vactst(i) VALUES (1);
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst(i) VALUES (0);
+SELECT count(*) FROM vactst;
+ count 
+-------
+  2049
+(1 row)
+
+DELETE FROM vactst WHERE i != 0;
+SELECT i FROM vactst ORDER BY 1;
+ i 
+---
+ 0
+(1 row)
+
+VACUUM FULL vactst;
+UPDATE vactst SET i = i + 1;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst SELECT * FROM vactst;
+INSERT INTO vactst(i) VALUES (0);
+SELECT count(*) FROM vactst;
+ count 
+-------
+  2049
+(1 row)
+
+DELETE FROM vactst WHERE i != 0;
+VACUUM FULL vactst;
+DELETE FROM vactst;
+SELECT i FROM vactst ORDER BY 1;
+ i 
+---
+(0 rows)
+
+DROP TABLE vactst;

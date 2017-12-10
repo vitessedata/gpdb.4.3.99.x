@@ -1,0 +1,230 @@
+2017-11-03:
+	R1623: Enable snmp
+	R1623: Fix race condition in xdrive fork
+
+2017-11-02:
+	R1623: Release
+	R1623: Fix issues relating to xdrive writes
+	R1623: Upgrade GRPC
+
+2017-09-05:
+	R1620: Resolves an issue with .so lib dependency 
+
+2017-09-04:
+	R1620: Fixes for dg transfer
+
+2017-09-03:
+	R1620: Minor fixes
+
+2017-08-29:
+	R1620: Misc performance improvements 
+
+2017-08-17:
+	R1620: Release
+	R1620: speed up extract(YEAR|MONTH|DAY from date) 
+	R1620: speed up to_char(date, 'YYYY-MM-DD')
+
+2017-08-15:
+	R1619: Fix a memory issue when scanning partitioned tables
+	R1619: Significantly speed up extract(X from date) where X is year, month, or day
+
+
+2017-08-06: 
+	R1619: released
+
+2017-07-05:
+	R1618: released
+
+2017-05-23:
+	R1617: Fix an issue for xdrctl stop on RH6
+
+2017-05-21:
+	R1617: Fix an issue when reading from S3 
+
+2017-05-19:
+	R1617: Fix an issue in CsvParser where buffer overruns if line contains 
+	       more fields than schema
+
+2017-05-18:
+	R1617: released
+
+2017-05-08:
+	R1617: beta 2
+	R1617: Add UUID contrib module
+
+2017-04-30:
+	R1617: beta 1
+	R1617: Fix an issue in ShareInput node where a ^C causes the query to hang
+	R1617: Add casts from text and varchar to json
+
+2017-04-15:
+	R1616: fix an issue in loftd
+
+2017-04-06:
+	R1616: released
+
+2017-03-26
+	R1616: beta #3
+	R1616: apply faster hash algorithm 
+	R1616: fix a cannot-cancel-query problem during big spill
+	R1616: add a new command to SAMPLE rows of a table 
+
+2017-03-17
+	R1616: beta #2
+	R1616: recompile with gcc 4.9
+
+2017-03-12
+	R1616: beta #1
+	R1616: zstd compression!
+	R1616: improved xdrive filter capability.
+	R1616: xdrive plugin framework
+
+2017-02-22
+	R1615: new spq page format. LOFTD and XDRIVE not compatible with older versions. Please restart.
+
+2017-02-21
+	R1615: released
+
+2017-02-08
+	R1615: beta #1
+	R1615: xdrive!
+
+2017-01-31
+	R1613: released
+
+2017-01-23
+	R1613: beta #2
+	R1613: merged more upstream bug fixes
+
+2017-01-06
+	R1613: beta #1
+	R1613: merged new analyze table functionality
+	R1613: removed dependency on many python modules, eg paramiko
+
+2016-12-25
+	R1611: fix a memory leak problem when doing string_agg
+
+2016-12-19
+	R1611: a performance fix that impacts count distinct and analyze
+
+2016-12-15
+	R1611: fix 2 minor issues in shared scan and external table scan.
+
+2016-11-17
+	R1611: port more fixes from upstream
+	R1611: fix performance problem for very wide tables
+
+2016-10-22
+	R1611: fix an issue when pushing too many filters to exttab 
+	R1611: fix an issue in greenplum sql parser
+	R1611: ported some fix from ORCA
+
+2016-10-13
+	R1611: branched
+	R1611: fix an issue with large (>1000) number of columns
+	R1611: hjoin performance enhancements
+	R1611: removed paramiko dependency in python
+	R1611: include postgis and madlib 
+
+2016-09-25
+	R1610: branched
+	R1610: fixed an issue concering gphdfs guc and config
+	R1610: fixed an issue concering spill memory accounting
+	R1610: sped up spill files using memtuples
+	R1610: includes xdrive
+
+2016-09-17
+	R1608: address a corner issue in hashjoin
+	R1608: add capability to filter NUMERIC type data in LOFTD 
+	R1608: address a cannot-cancel-query issue in a Materialize node.
+
+2016-08-29
+	R1608: improvements to queries that use LIMIT clause.
+		improvements to queries that require SORT clause.
+
+2016-08-29
+	R1608: improvements to queries that use LIMIT clause.
+		improvements to queries that require SORT clause.
+
+2016-08-01
+	R1608: bug fix release. 
+
+2016-07-13
+
+	R1606: bug fix release plus changes to pg2x utilities
+
+2016-05-06
+	
+	R1605: lz4 and json support
+
+2016-04-30
+	
+	R1604: first release
+
+2016-04-27
+
+	RC1 - with gpinitsystem bug fix
+
+2016-04-26
+
+	RC1
+
+2016-04-19
+
+	Small bug fix on subplans execution.
+
+2016-04-18 
+
+	Bug fix.
+
+2016-04-17 
+
+	Better support for partition selection and shared input methods.
+	Fast CSV parsing in segments.
+	Decimal64 and Decimal128 support
+
+2016-04-05
+
+	Better support for plans originating from ORCA.
+
+2016-03-30
+	
+	Enhanced partition-selector node.
+
+2016-03-24
+
+	Many fixes.
+
+2016-03-05
+
+	Small fix to print out of explain analyze.
+
+2016-03-04
+
+	Fix an issue with double precision type in spill.
+	Make guc threshold default to 1000;
+
+2016-03-03
+
+	Many fixes. 
+
+2016-02-23
+
+	Fixed a bug spill.
+
+2016-02-18
+
+	Add decimal64 and decimal128 types.
+
+2016-02-15
+
+	Some fixes in ORCA integration.
+
+2016-02-13
+
+	Fix a bug in greenplum CRC code that causes a segfault due to 
+	unaligned memory access.
+
+2016-01-29 
+
+	Initial release.

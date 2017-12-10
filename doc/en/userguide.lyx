@@ -1,0 +1,794 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass scrbook
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package auto
+\inputencoding utf8
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+DeepGreen User's Guide
+\end_layout
+
+\begin_layout Publishers
+Copyright VitesseData Inc, 2016.
+ All Rights Reserved.
+\end_layout
+
+\begin_layout Chapter
+Introduction
+\end_layout
+
+\begin_layout Standard
+DeepGreen DB is a MPP Database derived from the open source Greenplum Database
+ project.
+ DeepGreen DB implmeneted a LLVM based JIT query execution engine that dynamical
+ly generate machine code for each SQL query, dramatically increases the
+ performance of Greenplum Database.
+ DeepGreen maintain 100% compatibility with Greenplum Database.
+ User should observe no difference between DeepGreen DB and Greenplum Database
+ other than the increased performance.
+ Therefore, we refer user to the Greenplum project and PostgreSQL project
+ for documentation.
+\end_layout
+
+\begin_layout Standard
+DeepGreen DB further extends Greenplum Database by adding new data types,
+ functions, external database accesses and management utilitlies.
+ This document covers these features.
+\end_layout
+
+\begin_layout Chapter
+GUCs
+\end_layout
+
+\begin_layout Standard
+DeepGreen added the following GUCs,
+\end_layout
+
+\begin_layout Description
+deepgreen.enable (boolean, default true).
+ Enable or disable JIT engine.
+ When disabled, DeepGreen DB should behave exactly the same as Greenplum.
+\end_layout
+
+\begin_layout Description
+deepgreen.explain_verbosity (integer, 0, 1, or 2, default 0).
+ Control the verbosity of JIT information in the output of explain analyze.
+ 
+\end_layout
+
+\begin_layout Description
+deepgreen.threshold (integer).
+ Because JIT compilation cost some time, for very short queries, the compilation
+ cost will overweight the query execution.
+ This GUC turns off JIT if the query optimizer decides that query execution
+ cost is less this threshold.
+\end_layout
+
+\begin_layout Description
+deepgreen.xdrive_host (string) Default XDrive host.
+\end_layout
+
+\begin_layout Description
+deepgreen.xdrive_port (int) Defaulit XDrive port.
+\end_layout
+
+\begin_layout Description
+deepgreen.version (string) Version string.
+ It is readonly, cannot be set.
+\end_layout
+
+\begin_layout Description
+deepgreen.rev (string) Revision string.
+ It is readonly, cannot be set.
+\end_layout
+
+\begin_layout Chapter
+New Data Types, Functions
+\end_layout
+
+\begin_layout Section
+Decimal64 and Decimal128
+\end_layout
+
+\begin_layout Standard
+Decimal64 and Decimal128 implement the 64 and 128 bits decimal floating
+ as defined in IEEE-754 2008.
+ Unlike the the variable length numeric datatype, the 64/128 bits decimal
+ format is much more efficient.
+ Decimal64 can accurately represent 16 decimal digits and Decimal128 can
+ accurately represent 34 decimal digits.
+ All major arithemtic functions and aggreates are supported.
+\end_layout
+
+\begin_layout Section
+LZ4 Compression
+\end_layout
+
+\begin_layout Standard
+User can specify a new compression algorithm 'lz4' for table and/or column.
+ LZ4 is an extremely fast compression algorithm that can be up to ten times
+ faster than the zlib algorithm.
+\end_layout
+
+\begin_layout Section
+High Performance Regular Expression Engine
+\end_layout
+
+\begin_layout Standard
+DeepGreen added the following regular expression functions.
+ In all the following functions, a pattern must be a constant string of
+ regular expression pattern.
+\end_layout
+
+\begin_layout Description
+bool
+\begin_inset space ~
+\end_inset
+
+re_match(text,pattern) Regular expression match.
+\end_layout
+
+\begin_layout Description
+text
+\begin_inset space ~
+\end_inset
+
+re_match_extract(text,pattern) Regular expression match and return first
+ matching result.
+ If not matched, return NULL.
+\end_layout
+
+\begin_layout Description
+text[]
+\begin_inset space ~
+\end_inset
+
+re_match_extract_array(text,pattern) Regular expression match and return
+ all matching results in an array.
+ If not matched, return NULL.
+\end_layout
+
+\begin_layout Description
+text[]
+\begin_inset space ~
+\end_inset
+
+re_split(text,pattern) Split text using pattern.
+\end_layout
+
+\begin_layout Description
+text
+\begin_inset space ~
+\end_inset
+
+re_replace(text,pattern,replacement) Replace matching part with constant
+ replacement string.
+\end_layout
+
+\begin_layout Section
+Approximate Count Distinct using HyperLogLog
+\end_layout
+
+\begin_layout Description
+Approximate_count_distinct An aggregate that returns an approximate distinct
+ count on input, within 1% accuracy.
+ 
+\end_layout
+
+\begin_layout Section
+JSON
+\end_layout
+
+\begin_layout Standard
+DeepGreen ported PostgreSQL 9.4 JSON type.
+ All JSON functions and operators except table/set returning functions and
+ populate_record, json_agg, are also ported.
+ We expect JSON type will be ported to upstream Greenplum soon.
+\end_layout
+
+\begin_layout Section
+DG Setup
+\end_layout
+
+\begin_layout Standard
+All the features mentioned in this Chapter are implemented as UDT and UDF
+ (User Defined Type and User Defined Functions) for DeepGreen.
+ To enable these features, user should run the dg setup utiltlity.
+ For example, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+dg setup -all template1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We recommend user to run dg setup -all template1 after installing and initiating
+ DeepGreen cluster so that later created database will pickup these features
+ automatically.
+\end_layout
+
+\begin_layout Standard
+dg setup accepts the following options,
+\end_layout
+
+\begin_layout Description
+-all Setup all features
+\end_layout
+
+\begin_layout Description
+-decimal Enable decimal64/128 types and related functions.
+\end_layout
+
+\begin_layout Description
+-dg_utils Enable deepgreen utilities, dg_utils are required for using dg
+ transfer.
+\end_layout
+
+\begin_layout Description
+-hll Enable approximate count distinct.
+\end_layout
+
+\begin_layout Description
+-host Database connection information, host.
+\end_layout
+
+\begin_layout Description
+-pgcryto Enable pgcrypto functions.
+\end_layout
+
+\begin_layout Description
+-port Database connection information, port.
+\end_layout
+
+\begin_layout Description
+-re Enable fast regular expresssion engine.
+\end_layout
+
+\begin_layout Description
+-user Database connection information, user.
+\end_layout
+
+\begin_layout Description
+-verbose Print verbose info.
+\end_layout
+
+\begin_layout Chapter
+XDrive
+\end_layout
+
+\begin_layout Section
+Concepts and Examples
+\end_layout
+
+\begin_layout Standard
+First of all, XDrive enables DeepGreen cluster to access data stored outside
+ of the database.
+ DeepGreen database communicate XDrive using external table interface.
+ To access data, user need to define 
+\begin_inset Quotes eld
+\end_inset
+
+mount point
+\begin_inset Quotes erd
+\end_inset
+
+ in XDrive configuration.
+ One common scenarios is to install XDrive in the same nodes of a DeepGreen
+ cluster.
+ Each DeepGreen database segment then communicates with the XDrive service
+ running on localhost.
+ XDrive can also run in completely different hosts from DeepGreen cluster.
+ By separating XDrive from DeepGreen cluster, we can share XDrive service,
+ therefore sharing data, between different DeepGreen clusters.
+\end_layout
+
+\begin_layout Standard
+To access external data source, the external data storage must be mounted
+ by XDrive.
+ XDrive read mount points from a configuration file when starts up.
+ At this time, XDrive support mounting external data stored in NFS, HDFS
+ and AWS S3.
+ DeepGreen database accesses XDrive mount point using external table.
+ Supported data formats of the external table are CSV and SPQ.
+ We expect to release mount point types on more storage systems and more
+ data formats in the next release.
+\end_layout
+
+\begin_layout Section
+Mount Point Syntax
+\end_layout
+
+\begin_layout Standard
+XDrive read mount points from a configuration file.
+ Like LINUX fstab file, each mount point is specified by a single line,
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+xdrive.mount = name:protocol:rootdir:connection_info
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Name is the mount point name.
+ We supported protocols can be 
+\begin_inset Quotes eld
+\end_inset
+
+nfs
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+hdfs
+\begin_inset Quotes erd
+\end_inset
+
+, or 
+\begin_inset Quotes eld
+\end_inset
+
+s3
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Rootdir is the path relative to the XDrive directory in nfs protocol, or,
+ absolute path for hdfs or s3 protocol.
+ Connection info is the connection string to hdfs or s3.
+ The following is an example conf file,
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+xdrive.mount1 = mynfs:nfs:./data:
+\end_layout
+
+\begin_layout Plain Layout
+
+xdrive.mount2 = myhdfs:hdfs:/data:name_node=localhost,port=9000
+\end_layout
+
+\begin_layout Plain Layout
+
+xdrive.mount3 = mys3:s3:/data:bucket=s3bucket,region=us-west-1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+While we use nfs as the protocol name, XDrive should work with other distributed
+ filesytems like AFS, Lustre, CephFS, etc.
+ As a special case, if the XDrive cluster has only one hosts, Linux local
+ file systems also work.
+ This is convinient for sharing moderate amount data hosted by one machine.
+\end_layout
+
+\begin_layout Standard
+All protocols need the hosts that running XDrive have proper connection
+ and securiety settting, for example, S3 protocol need .aws/credentials.
+\end_layout
+
+\begin_layout Section
+External Table Syntax 
+\end_layout
+
+\begin_layout Standard
+User can create external tables to access XDrive.
+ The external syntax is the same as Greenplum external table syntax.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+CREATE EXTERNAL TABLE table_name (columnspec)
+\end_layout
+
+\begin_layout Plain Layout
+
+LOCATION ('xdrive://xdrive.host:xdrive.port/mountpoint/reader_path')
+\end_layout
+
+\begin_layout Plain Layout
+
+FORMAT 'CSV' [csv options]
+\end_layout
+
+\begin_layout Plain Layout
+
+     | 'SPQ'
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+CREATE WRITABLE EXTERNAL TABLE write_table_name (columnspec)
+\end_layout
+
+\begin_layout Plain Layout
+
+LOCATION ('xdrive://xdrive.host:xdrive.port/mountpoint/writer_path')
+\end_layout
+
+\begin_layout Plain Layout
+
+FORMAT 'CSV' [csv options]
+\end_layout
+
+\begin_layout Plain Layout
+
+     | 'SPQ'
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+XDrive supports two format, 'CSV' and 'SPQ'.
+ SPQ is DeepGreen's own high performance, column store format.
+\end_layout
+
+\begin_layout Standard
+It is worth note on the reader_path and writer_path in the location clause.
+ Reader_path can be a Unix file glob pattern.
+ Writer_path support three substitution patterns,
+\end_layout
+
+\begin_layout Description
+#SEGID# Will be replaced by the segment id that writes the data.
+\end_layout
+
+\begin_layout Description
+#SEGCOUNT# Will be replaced by the total number of segments.
+\end_layout
+
+\begin_layout Description
+#UUID# Will be replaced by a randomly generated UUID.
+\end_layout
+
+\begin_layout Standard
+The semantics of writable external table is the following,
+\end_layout
+
+\begin_layout Itemize
+Write is always parallel, that is, all segments (but not master) will write
+ to xdrive.
+\end_layout
+
+\begin_layout Itemize
+If writer_path has #UUID#, a different UUID will be generate for each segments.
+\end_layout
+
+\begin_layout Itemize
+If writer_path has no substitution pattern, data on XDrive may be overwritten,
+ or write may fail if the path already exists and the mount type does not
+ support overwrite.
+\end_layout
+
+\begin_layout Standard
+XDrive is designed to support many writer from many clusters, or even writers
+ that are not deepgreen, to export data to XDrive and shared by many readers.
+ As an example, user can use the #UUID# substitute pattern when write, and
+ later many readers from different clusters can use a * in glob pattern
+ to access data.
+\end_layout
+
+\begin_layout Section
+dg xdrive 
+\end_layout
+
+\begin_layout Standard
+Deepgreen provides dg xdrive to manage XDrive cluster.
+ Dg xdrive command requires user to setup keyless ssh on all the hosts in
+ the xdrive cluster.
+ DeepGreen binary should be installed in the same location (dghome) in all
+ the hosts.
+ User should call dg xdrive init to setup a directory for xdrive on each
+ hosts.
+ Later dg xdrive will use the directory to store error log and can access
+ local data stored in the directory.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+dg xdrive -dghome=DGHOME init|start|stop|restart|config|status dir conf
+ hosts
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where, DGHOME is the DeepGreen installation directory.
+ Dir is the working dir of xdrive.
+ conf file should specify the xdrive mount points.
+ hosts file list the hostname:port pair of nodes in the XDrive cluster.
+ 
+\end_layout
+
+\begin_layout Standard
+Dg xdrive takes the following options,
+\end_layout
+
+\begin_layout Description
+-dghome The DeepGreen installation directory.
+\end_layout
+
+\begin_layout Description
+-x Default false, in this case, XDrive is started to serve a single deepgreen
+ cluster.
+ In this case the hosts file must contain one entry for each node in the
+ deepgreen cluster.
+ If -x is set, the XDrive cluster will be started in shared mode, that is,
+ can serve many DeepGreen clusters.
+\end_layout
+
+\begin_layout Standard
+Dg xdrive commands are,
+\end_layout
+
+\begin_layout Description
+init Initialize the xdrive working dir.
+ The directory will be created if it does not yet exist.
+ Later start/restart will use this directory to store error log.
+ Also, dg xdrive will start XDrive process and chroot to this directory.
+ 
+\end_layout
+
+\begin_layout Description
+(re)start Start/Restart XDrive cluster.
+\end_layout
+
+\begin_layout Description
+stop Stop XDrive cluster.
+\end_layout
+
+\begin_layout Description
+status Report XDrive liveness.
+\end_layout
+
+\begin_layout Description
+config Update conf file (mount points) for the cluster.
+ User need to restart the cluster for the config to take effect.
+ 
+\end_layout
+
+\begin_layout Chapter
+DG Transfer
+\end_layout
+
+\begin_layout Standard
+Dg transfer is a high performance, scalable data transfer uitility between
+ deepgreen databases.
+ To set up transfer, user should have started the source and destination
+ deepgreen cluster.
+ dg transfer requires an xdrive cluster, usually, an xdrive cluster started
+ on the destination deepgreen cluster.
+ Please refer to dg xdrive on how to initialize, start xdrive cluster.
+ Dg transfer also requires dg_utilts module being properly setup in source
+ database.
+ Once setup properly user can transfer a database using
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+dg transfer -src.host= -src.port= -src.db= -dst.host= -dst.port= -dst.db=
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+dg transfer takes the following options,
+\end_layout
+
+\begin_layout Description
+-src.host Source deepgreen cluster connection information host.
+\end_layout
+
+\begin_layout Description
+-src.port Source deepgreen cluster connection information port.
+\end_layout
+
+\begin_layout Description
+-src.user Source deepgreen cluster connection user name.
+\end_layout
+
+\begin_layout Description
+-src.db Source database name.
+\end_layout
+
+\begin_layout Description
+-dst.host Destination deepgreen cluster host.
+\end_layout
+
+\begin_layout Description
+-dst.port Destination deepgreen cluster port.
+\end_layout
+
+\begin_layout Description
+-dst.user Destination deepgreen cluster user name.
+\end_layout
+
+\begin_layout Description
+-dst.db Destination database name.
+\end_layout
+
+\begin_layout Description
+-xdrive.hosts XDrive hosts to use for transfer.
+\end_layout
+
+\begin_layout Description
+-xdrive.port If using xdrive cluster running in destintion deepgreen cluster,
+ user can just specify xdrive port number instead of using xdrive.hosts.
+ 
+\end_layout
+
+\begin_layout Description
+-schema The schema to transfer.
+ If not specified, all schemas will be transfered.
+\end_layout
+
+\begin_layout Description
+-table The table to transfer.
+ If not specified, all tables in the schema will be transfered.
+\end_layout
+
+\begin_layout Description
+-tablelist A file that each line contains schema.table to transfer.
+\end_layout
+
+\begin_layout Description
+-schemaonly Transfer database schema only, do not copy data over.
+\end_layout
+
+\begin_layout Description
+-ifexists=drop/keep/skip If destination table already exists, transfer should
+ drop and create new table, or, keep and use the table, or, skip transfer
+ data for the table.
+\end_layout
+
+\begin_layout Description
+-keepowner If keep destination table owner.
+\end_layout
+
+\begin_layout Description
+-index Rebuild index after transfer.
+\end_layout
+
+\begin_layout Description
+-analyze Run analyze after transfer.
+\end_layout
+
+\begin_layout Description
+-verify Verify the database, or schema, or table specified in the command
+ contains same data.
+ -verify is a readonly operation.
+ It will not transfer data.
+\end_layout
+
+\begin_layout Description
+-verbose Print more information during transfer.
+\end_layout
+
+\end_body
+\end_document
